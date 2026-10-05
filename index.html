@@ -1,17 +1,20 @@
 <!--
 THESIS: An airport wayfinding board makes agency outlooks comparable at a glance, not a stack of generic KPI cards.
 OWN-WORLD: Saturated route-yellow signs, black ink, white pictograms, and cobalt prior-year markers; crisp humanist sans plus tabular figures.
-STORY: Readers scan the FY28 growth corridor, compare FY27 estimates, then open an agency to inspect its drivers, policy, and cited workbook references.
-FIRST VIEWPORT: Yellow title band above live filters and a four-signal strip; the paired-year forecast board begins immediately below, with agency rows next.
+STORY: Readers scan the FY28 growth corridor, compare matched agency revisions, test growth-driver themes and data coverage, then open source-backed agency detail.
+FIRST VIEWPORT: Yellow title band above live filters and the four-signal strip; a workbook-wide revision and coverage analysis follows before the agency chart and rows.
 FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, an agency-led departure board. Seed keys: direction 18627a80, surface ac5dda1b.
 -->
 <!doctype html>
 <html lang="en">
 <head>
-  <meta name="google-site-verification" content="uSXo323QyuJaHqa_Bke8m-XHIka_-C6KlWA7rDIFhy4" />
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="An interactive comparison of agency projections for India's FY2027–28 economic outlook.">
+  <meta name="theme-color" content="#ffd928">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="India Economic Outlook · FY2027–28">
+  <meta property="og:description" content="Compare agency forecasts for growth, inflation, drivers, and policy outlook using the supplied workbook.">
   <title>India Economic Outlook · FY2027–28</title>
   <style>
     :root {
@@ -195,6 +198,86 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
     .signal:nth-child(4) .signal-label, .signal:nth-child(4) .signal-note { color: #d7dfde; }
     .signal:nth-child(4) .signal-number { color: var(--yellow); }
 
+    .analysis-section { margin-top: 3.5rem; }
+    .analysis-thesis {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1.5rem;
+      padding: 1.2rem 1.4rem; background: var(--teal-pale); border-top: 3px solid var(--teal);
+    }
+    .analysis-thesis h3 { margin: 0; font-size: clamp(1.15rem, 2vw, 1.65rem); letter-spacing: -.04em; }
+    .analysis-thesis p { margin: .42rem 0 0; max-width: 68ch; color: #25433e; font-size: .82rem; line-height: 1.5; }
+    .thesis-mark { display: grid; width: 3.2rem; height: 3.2rem; place-items: center; background: var(--teal); color: white; font: 800 1.3rem var(--mono); }
+    .analysis-grid {
+      display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(18rem, .85fr);
+      gap: 1rem; margin-top: 1rem; align-items: stretch;
+    }
+    .analysis-sheet { min-width: 0; background: var(--white); border: 1px solid var(--line); }
+    .analysis-sheet-heading {
+      display: flex; justify-content: space-between; align-items: start; gap: 1rem;
+      padding: 1rem 1.1rem .85rem; border-bottom: 1px solid var(--line);
+    }
+    .analysis-sheet-heading h3 { margin: 0; font-size: 1rem; letter-spacing: -.025em; }
+    .analysis-sheet-heading p { margin: .3rem 0 0; color: var(--ink-soft); font-size: .72rem; line-height: 1.4; }
+    .analysis-sheet-heading p.theme-legend { display: flex; flex-wrap: wrap; gap: .25rem .7rem; align-items: center; }
+    .theme-legend span { display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; }
+    .theme-legend i { width: .48rem; height: .48rem; display: inline-block; background: var(--blue); }
+    .theme-legend .current-key { background: var(--teal); }
+    .analysis-stamp {
+      flex: 0 0 auto; padding: .28rem .4rem; background: var(--ink); color: white;
+      font: 700 .6rem var(--mono); text-transform: uppercase;
+    }
+    .revision-chart-wrap { padding: .55rem .75rem .25rem; }
+    #revisionChart { display: block; width: 100%; }
+    .analysis-footnote {
+      padding: .7rem 1rem .85rem; border-top: 1px solid var(--line);
+      color: var(--ink-soft); font-size: .7rem; line-height: 1.5;
+    }
+    .analysis-footnote strong { color: var(--ink); }
+    .theme-list { display: grid; gap: 1rem; padding: 1.05rem 1.1rem; }
+    .theme-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .4rem .8rem; align-items: baseline; }
+    .theme-label { font-size: .76rem; font-weight: 700; }
+    .theme-count { display: flex; gap: .6rem; font: 700 .64rem var(--mono); color: var(--ink-soft); white-space: nowrap; }
+    .theme-count .prior-count { color: #203da7; }
+    .theme-count .current-count { color: #11665e; }
+    .theme-pairtracks { grid-column: 1 / -1; display: grid; gap: .2rem; }
+    .theme-track { height: .3rem; background: #e8edeb; }
+    .theme-fill { display: block; height: 100%; background: var(--teal); }
+    .theme-fill.prior { background: var(--blue); }
+    .theme-fill.current { background: var(--teal); }
+    .coverage-sheet { margin-top: 1rem; background: var(--ink); color: white; }
+    .coverage-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+      padding: 1rem 1.1rem; border-bottom: 1px solid #495052;
+    }
+    .coverage-head h3 { margin: 0; font-size: 1rem; }
+    .coverage-head span { color: #d7dfde; font: 700 .62rem var(--mono); text-transform: uppercase; }
+    .coverage-table { width: 100%; border-collapse: collapse; font-size: .74rem; }
+    .coverage-table th, .coverage-table td { padding: .7rem 1rem; border-bottom: 1px solid #41494b; text-align: left; }
+    .coverage-table th { color: #d7dfde; font: 700 .64rem var(--mono); text-transform: uppercase; }
+    .coverage-table th:not(:first-child), .coverage-table td:not(:first-child) { text-align: right; }
+    .coverage-table td:nth-child(2) { color: #ffe36b; }
+    .coverage-table td:nth-child(3) { color: #b7c5ff; }
+    .coverage-table tr:last-child td { border-bottom: 0; }
+    .coverage-note { margin: 0; padding: .65rem 1rem .9rem; color: #d7dfde; font-size: .68rem; line-height: 1.5; }
+    .analysis-method {
+      margin-top: 1rem; padding: .85rem 1rem; border: 1px solid var(--line);
+      color: var(--ink-soft); font-size: .7rem; line-height: 1.55;
+    }
+    .analysis-method strong { color: var(--ink); }
+    .snapshot-sheet { margin-top: 1rem; background: var(--white); border: 1px solid var(--line); }
+    .snapshot-table { width: 100%; border-collapse: collapse; font-size: .75rem; }
+    .snapshot-table th, .snapshot-table td { padding: .72rem 1rem; border-bottom: 1px solid var(--line); text-align: left; }
+    .snapshot-table th { color: var(--ink-soft); font: 700 .64rem var(--mono); text-transform: uppercase; }
+    .snapshot-table th:not(:first-child), .snapshot-table td:not(:first-child) { text-align: right; }
+    .snapshot-table td:nth-child(2) { color: #203da7; font-variant-numeric: tabular-nums; font-weight: 700; }
+    .snapshot-table td:nth-child(3) { color: #806600; font-variant-numeric: tabular-nums; font-weight: 700; }
+    .snapshot-table tr:last-child td { border-bottom: 0; }
+    .delta-axis { fill: #667174; font: 10px var(--mono); }
+    .delta-agency { fill: #15191a; font: 700 11px var(--sans); }
+    .delta-value { fill: #15191a; font: 700 10px var(--mono); }
+    .delta-grid { stroke: #e1e6e4; stroke-width: 1; }
+    .delta-hit { cursor: pointer; }
+    .delta-hit:focus .delta-agency, .delta-hit:hover .delta-agency { fill: var(--blue); }
+
     .section-heading {
       display: flex; justify-content: space-between; align-items: end; gap: 1rem;
       margin: 2.8rem 0 1rem;
@@ -351,6 +434,7 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
       .signal:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
       .agency-row { grid-template-columns: minmax(10rem, 1fr) minmax(13rem, 1.1fr) minmax(5.7rem, .5fr) auto; }
       .agency-row .sources-cell { display: none; }
+      .analysis-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 620px) {
       .topline { min-height: 3.35rem; }
@@ -359,19 +443,35 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
       .top-meta { gap: .38rem; font-size: .56rem; }
       .top-board { display: none; }
       .intro { padding: 2.7rem 0 2.2rem; }
-      h1 { max-width: none; font-size: clamp(2.3rem, 11.4vw, 3.6rem); }
-      .intro-note { font-size: .9rem; }
+      h1 { max-width: none; font-size: clamp(2rem, 9vw, 3.2rem); }
+      .intro > div, .intro-note { width: 100%; max-width: 100%; min-width: 0; }
+      .intro-note { font-size: .9rem; overflow-wrap: anywhere; }
       main { padding-inline: 1rem; }
-      .control-deck { grid-template-columns: 1fr; gap: .7rem; padding-top: .85rem; }
+      .control-deck { width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr); gap: .7rem; padding-top: .85rem; }
+      .year-switch, .search-wrap, .deck-actions { width: 100%; min-width: 0; }
       .year-switch { display: grid; grid-template-columns: repeat(3, 1fr); }
       .year-button { min-width: 0; padding-inline: .2rem; font-size: .58rem; }
       .search-wrap { grid-column: 1; grid-row: 2; }
       .deck-actions { grid-column: 1; grid-row: 3; justify-content: stretch; }
-      .deck-actions .action-button { flex: 1; }
-      .signal-strip { margin-top: 1rem; }
+      .deck-actions .action-button { flex: 1; min-width: 0; }
+      .signal-strip { width: 100%; min-width: 0; margin-top: 1rem; }
       .signal { min-height: 7.1rem; padding: .85rem .8rem; }
+      .signal { min-width: 0; }
       .signal-label { font-size: .57rem; }
       .signal-note { font-size: .67rem; }
+      .signal-number { font-size: clamp(1.05rem, 5.5vw, 1.8rem); overflow-wrap: anywhere; }
+      .analysis-section { margin-top: 2.5rem; }
+      .analysis-thesis { grid-template-columns: minmax(0, 1fr) auto; gap: .7rem; padding: .9rem; }
+      .thesis-mark { width: 2.5rem; height: 2.5rem; }
+      .analysis-thesis p { font-size: .75rem; }
+      .analysis-sheet-heading { padding: .85rem; }
+      .theme-list { padding: .9rem; }
+      .coverage-table th, .coverage-table td { padding: .65rem .55rem; font-size: .68rem; }
+      .snapshot-table th, .snapshot-table td { padding: .65rem .55rem; font-size: .68rem; }
+      .coverage-table, .snapshot-table { width: 100%; table-layout: fixed; }
+      .coverage-table th, .coverage-table td, .snapshot-table th, .snapshot-table td { overflow-wrap: anywhere; }
+      .coverage-head { padding: .85rem; }
+      .coverage-note { padding-inline: .75rem; }
       .section-heading { align-items: start; flex-direction: column; }
       .board-top { align-items: flex-start; flex-direction: column; }
       .chart-area { padding: .7rem .65rem .2rem; }
@@ -466,6 +566,78 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
         <p class="signal-number" id="spreadValue">0.6 pp</p>
         <p class="signal-note" id="spreadNote">Width of the FY2027–28 GDP forecast range</p>
       </div>
+    </section>
+
+    <section class="analysis-section" aria-labelledby="analysisHeading">
+      <div class="section-heading">
+        <div>
+          <h2 id="analysisHeading">Reading between the forecasts</h2>
+          <p>What shifts between fiscal years, where agencies align, and where the workbook is silent.</p>
+        </div>
+        <span class="section-code">Unweighted · workbook-only analysis</span>
+      </div>
+      <div class="analysis-thesis" aria-live="polite">
+        <div>
+          <h3 id="analysisHeadline">Most matched agencies moderate their growth outlook.</h3>
+          <p id="analysisLead">Five of six agencies with comparable point forecasts project slower growth in FY2027–28. The ADB's FY2028 range overlaps its FY2027 estimate, so it is shown separately.</p>
+        </div>
+        <span class="thesis-mark" aria-hidden="true">↘</span>
+      </div>
+      <div class="analysis-grid">
+        <article class="analysis-sheet">
+          <div class="analysis-sheet-heading">
+            <div>
+              <h3>Agency-by-agency revision</h3>
+              <p>FY2026–27 to FY2027–28 · percentage-point change</p>
+            </div>
+            <span class="analysis-stamp">Matched forecasts</span>
+          </div>
+          <div class="revision-chart-wrap">
+            <svg id="revisionChart" role="img" aria-label="Agency-by-agency change in GDP growth forecasts"></svg>
+            <p class="sr-only" id="revisionDescription"></p>
+          </div>
+          <div class="analysis-footnote" id="revisionNote"><strong>ADB range:</strong> FY2028's 6.6%–7.1% band is −0.4 to +0.1 pp versus its FY2027 7.0% forecast; the interval crosses zero.</div>
+        </article>
+        <article class="analysis-sheet">
+          <div class="analysis-sheet-heading">
+            <div>
+              <h3>What agencies cite</h3>
+              <p class="theme-legend">
+                Agency mentions · <span><i class="prior-key" aria-hidden="true"></i>FY2026–27</span>
+                <span><i class="current-key" aria-hidden="true"></i>FY2027–28</span>
+              </p>
+            </div>
+            <span class="analysis-stamp">Narrative themes</span>
+          </div>
+          <div class="theme-list" id="themeList"></div>
+          <div class="analysis-footnote" id="policyRead"><strong>Policy read:</strong> prior-year tightening and current-year easing language diverge, with incomplete prior-year policy coverage.</div>
+        </article>
+      </div>
+      <article class="snapshot-sheet">
+        <div class="analysis-sheet-heading">
+          <div>
+            <h3>Year-level forecast snapshot</h3>
+            <p>Unweighted summaries of each fiscal year's available agency entries</p>
+          </div>
+          <span class="analysis-stamp">Reported sample</span>
+        </div>
+        <table class="snapshot-table">
+          <thead><tr><th>Measure</th><th>FY2026–27</th><th>FY2027–28</th></tr></thead>
+          <tbody id="snapshotRows"></tbody>
+        </table>
+      </article>
+      <article class="coverage-sheet">
+        <div class="coverage-head">
+          <h3>Coverage &amp; comparability</h3>
+          <span>Forecast entries with data / 9 agencies</span>
+        </div>
+        <table class="coverage-table">
+          <thead><tr><th>Workbook field</th><th>FY2027–28</th><th>FY2026–27</th></tr></thead>
+          <tbody id="coverageRows"></tbody>
+        </table>
+        <p class="coverage-note" id="coverageNarrative">Prior-year average and median use seven reported GDP forecasts; the current-year average uses nine agency forecasts and the midpoint of ADB's reported range.</p>
+      </article>
+      <p class="analysis-method"><strong>Method:</strong> Each agency is counted once per theme using transparent keyword tagging of its driver text. Averages and medians are unweighted; ADB's range midpoint is used for averages only, and its change is shown as an interval. Coverage is counted from populated workbook cells, not inferred.</p>
     </section>
 
     <section aria-labelledby="chartHeading">
@@ -584,6 +756,152 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
     })[char]);
     const agencyNames = [...new Set(forecasts.map((item) => item.agency))];
     const formatYear = (year) => year === "FY2027–28" ? "FY27–28" : "FY26–27";
+    const analysisThemes = [
+      { label: "Private demand & consumption", pattern: /private (?:final )?consumption|consumer spending|domestic demand|household incomes|domestic consumption/i },
+      { label: "Investment & infrastructure", pattern: /investments?|capital formation|infrastructure buildout|manufacturing push/i },
+      { label: "Services & exports", pattern: /services?|net export contributions/i },
+      { label: "Energy & geopolitical risks", pattern: /energy|middle east conflict|west asia|oil price/i }
+    ];
+
+    function getGrowthMidpoint(item) {
+      return item && item.low !== null ? (item.low + item.high) / 2 : null;
+    }
+
+    function summarizeYear(year) {
+      const entries = forecasts.filter((item) => item.year === year);
+      const withGrowth = entries.filter((item) => item.low !== null);
+      const midpoints = withGrowth.map(getGrowthMidpoint).sort((a, b) => a - b);
+      const median = midpoints.length % 2
+        ? midpoints[(midpoints.length - 1) / 2]
+        : (midpoints[midpoints.length / 2 - 1] + midpoints[midpoints.length / 2]) / 2;
+      return {
+        entries,
+        withGrowth,
+        midpoints,
+        mean: midpoints.reduce((sum, value) => sum + value, 0) / midpoints.length,
+        median,
+        rangeLow: Math.min(...withGrowth.map((item) => item.low)),
+        rangeHigh: Math.max(...withGrowth.map((item) => item.high)),
+        inflationCount: entries.filter((item) => item.inflation !== "Not in source").length,
+        policyCount: entries.filter((item) => item.policy !== "Not in source").length
+      };
+    }
+
+    function matchedPointForecasts() {
+      return agencyNames.flatMap((agency) => {
+        const prior = entryFor(agency, "FY2026–27");
+        const current = entryFor(agency, "FY2027–28");
+        if (!prior || !current || prior.low === null || prior.low !== prior.high || current.low === null || current.low !== current.high) return [];
+        return [{ agency, prior: prior.low, current: current.low, change: current.low - prior.low }];
+      });
+    }
+
+    function renderAnalysis() {
+      const prior = summarizeYear("FY2026–27");
+      const current = summarizeYear("FY2027–28");
+      const paired = matchedPointForecasts();
+      const lower = paired.filter((item) => item.change < 0).length;
+      const meanPrior = paired.reduce((sum, item) => sum + item.prior, 0) / paired.length;
+      const meanCurrent = paired.reduce((sum, item) => sum + item.current, 0) / paired.length;
+      const meanChange = meanCurrent - meanPrior;
+      document.getElementById("analysisHeadline").textContent = `${lower} of ${paired.length} matched point forecasts are lower.`;
+      document.getElementById("analysisLead").textContent =
+        `For ${paired.length} agencies with single-point forecasts in both years, the simple mean moves from ${meanPrior.toFixed(2)}% to ${meanCurrent.toFixed(2)}% (${meanChange > 0 ? "+" : "−"}${Math.abs(meanChange).toFixed(2)} pp). ADB's FY2028 range crosses its FY2027 estimate, so it is shown separately.`;
+      document.getElementById("revisionDescription").textContent =
+        paired.map((item) => `${item.agency}: ${item.change > 0 ? "+" : ""}${item.change.toFixed(1)} percentage points`).join("; ");
+      renderRevisionChart(paired);
+
+      document.getElementById("themeList").innerHTML = analysisThemes.map((theme) => {
+        const priorCount = prior.entries.filter((item) => theme.pattern.test(item.drivers)).length;
+        const currentCount = current.entries.filter((item) => theme.pattern.test(item.drivers)).length;
+        const priorShare = priorCount / prior.entries.length * 100;
+        const currentShare = currentCount / current.entries.length * 100;
+        return `<div class="theme-item">
+          <span class="theme-label">${escapeHtml(theme.label)}</span>
+          <span class="theme-count"><span class="prior-count">${priorCount}/${prior.entries.length}</span><span aria-hidden="true">·</span><span class="current-count">${currentCount}/${current.entries.length}</span></span>
+          <span class="theme-pairtracks" aria-hidden="true"><span class="theme-track"><span class="theme-fill prior" style="width:${priorShare}%"></span></span><span class="theme-track"><span class="theme-fill current" style="width:${currentShare}%"></span></span></span>
+        </div>`;
+      }).join("");
+      document.getElementById("policyRead").innerHTML =
+        `<strong>Policy read:</strong> all ${prior.policyCount} populated FY27 policy entries describe tightening; all ${current.policyCount} FY28 entries mention easing/neutrality, while OECD and Allianz also flag conditions that could prompt tightening. Coverage is incomplete for FY27.`;
+
+      const coverageRows = [
+        ["GDP growth", current.withGrowth.length, prior.withGrowth.length],
+        ["Inflation", current.inflationCount, prior.inflationCount],
+        ["Policy outlook", current.policyCount, prior.policyCount]
+      ];
+      document.getElementById("coverageRows").innerHTML = coverageRows.map(([label, fy28Count, fy27Count]) =>
+        `<tr><td>${label}</td><td>${fy28Count} / ${agencyNames.length}</td><td>${fy27Count} / ${agencyNames.length}</td></tr>`
+      ).join("");
+      const priorInflation = prior.entries.filter((item) => item.inflation !== "Not in source")
+        .map((item) => item.inflation.match(/\d+(?:\.\d+)?/g).map(Number));
+      const currentInflation = current.entries.filter((item) => item.inflation !== "Not in source")
+        .map((item) => item.inflation.match(/\d+(?:\.\d+)?/g).map(Number));
+      const inflationRange = (values) => values.length
+        ? `${Math.min(...values.map((entry) => entry[0])).toFixed(1)}%–${Math.max(...values.map((entry) => entry.at(-1))).toFixed(1)}% (${values.length} reports)`
+        : "Not in source";
+      document.getElementById("snapshotRows").innerHTML = [
+        ["Unweighted mean GDP growth", `${prior.mean.toFixed(2)}% (${prior.withGrowth.length} reports)`, `${current.mean.toFixed(2)}% (${current.withGrowth.length}; ADB midpoint)`],
+        ["Median GDP growth", `${prior.median.toFixed(2)}%`, `${current.median.toFixed(2)}%`],
+        ["Lowest–highest growth forecast", `${prior.rangeLow.toFixed(1)}%–${prior.rangeHigh.toFixed(1)}%`, `${current.rangeLow.toFixed(1)}%–${current.rangeHigh.toFixed(1)}%`],
+        ["Inflation forecast span", inflationRange(priorInflation), inflationRange(currentInflation)]
+      ].map(([label, fy27, fy28]) => `<tr><td>${label}</td><td>${fy27}</td><td>${fy28}</td></tr>`).join("");
+      document.getElementById("coverageNarrative").textContent =
+        `FY2026–27 has ${prior.withGrowth.length} numeric growth forecasts; FY2027–28 has ${current.withGrowth.length}. Summary means are unweighted, with ADB's FY2028 range midpoint (${getGrowthMidpoint(entryFor("Asian Development Bank (ADB)", "FY2027–28")).toFixed(2)}%) used as one observation. They are descriptive workbook summaries, not an agency-weighted consensus or a like-for-like full-sample comparison. Source citations are reference numbers and titles only; the workbook does not provide URLs for independent link verification.`;
+    }
+
+    function renderRevisionChart(paired) {
+      const svg = document.getElementById("revisionChart");
+      const width = Math.max(290, Math.round(svg.parentElement.clientWidth - 20));
+      const mobile = width < 460;
+      const left = mobile ? 69 : 205;
+      const right = 47;
+      const top = 18;
+      const rowHeight = mobile ? 34 : 37;
+      const axisHeight = 25;
+      const height = top + paired.length * rowHeight + axisHeight;
+      const min = -0.7;
+      const max = 0.4;
+      const plotWidth = width - left - right;
+      const x = (value) => left + (value - min) / (max - min) * plotWidth;
+      const zero = x(0);
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.setAttribute("height", String(height));
+      if (!paired.length) {
+        svg.innerHTML = `<text x="10" y="35" fill="#465052" font-size="12">No matched point forecasts are available.</text>`;
+        return;
+      }
+      let markup = `<line class="delta-grid" x1="${zero}" y1="${top - 5}" x2="${zero}" y2="${height - axisHeight + 1}"></line>`;
+      const ticks = [-0.5, 0, 0.3];
+      ticks.forEach((tick) => {
+        const px = x(tick);
+        markup += `<line class="delta-grid" x1="${px}" y1="${top - 5}" x2="${px}" y2="${height - axisHeight + 1}" opacity="${tick === 0 ? 0 : 1}"></line>`;
+        markup += `<text class="delta-axis" x="${px}" y="${height - 6}" text-anchor="middle">${tick > 0 ? "+" : ""}${tick.toFixed(1)} pp</text>`;
+      });
+      paired.forEach((item, index) => {
+        const y = top + index * rowHeight + rowHeight / 2;
+        const currentX = x(item.change);
+        const color = item.change < 0 ? "#167b71" : "#385ce8";
+        markup += `<g class="delta-hit" tabindex="0" role="button" aria-label="${escapeHtml(item.agency)} changed ${item.change > 0 ? "up" : "down"} ${Math.abs(item.change).toFixed(1)} percentage points" data-agency="${escapeHtml(item.agency)}">`;
+        markup += `<text class="delta-agency" x="${left - 9}" y="${y + 4}" text-anchor="end">${escapeHtml(mobile ? agencyAbbreviations[item.agency] : item.agency)}</text>`;
+        markup += `<line x1="${Math.min(zero, currentX)}" y1="${y}" x2="${Math.max(zero, currentX)}" y2="${y}" stroke="${color}" stroke-width="7" stroke-linecap="square"></line>`;
+        markup += `<circle cx="${currentX}" cy="${y}" r="4.5" fill="${color}" stroke="#fff" stroke-width="1.5"></circle>`;
+        const nearEdge = currentX > width - right - 36;
+        const textX = nearEdge ? currentX - 8 : currentX + 8;
+        markup += `<text class="delta-value" x="${textX}" y="${y + 4}" text-anchor="${nearEdge ? "end" : "start"}">${item.change > 0 ? "+" : "−"}${Math.abs(item.change).toFixed(1)}</text>`;
+        markup += `</g>`;
+      });
+      svg.innerHTML = markup;
+      svg.querySelectorAll(".delta-hit").forEach((mark) => {
+        mark.addEventListener("click", () => openAgency(mark.dataset.agency));
+        mark.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openAgency(mark.dataset.agency);
+          }
+        });
+      });
+    }
 
     function yearRows() {
       if (state.year === "both") return forecasts;
@@ -601,11 +919,16 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
       if (state.sort === "agency") return names.sort((a, b) => a.localeCompare(b));
       return names.sort((a, b) => {
         const valueFor = (name) => {
-          const item = forecasts.find((entry) => entry.agency === name && entry.year === "FY2027–28")
-            || forecasts.find((entry) => entry.agency === name);
-          return item && item.low !== null ? (item.low + item.high) / 2 : -Infinity;
+          const item = state.year === "both"
+            ? entryFor(name, "FY2027–28") || entryFor(name, "FY2026–27")
+            : entryFor(name, state.year);
+          return getGrowthMidpoint(item);
         };
-        return (valueFor(b) - valueFor(a)) * (state.sort === "growth-asc" ? -1 : 1) || a.localeCompare(b);
+        const first = valueFor(a);
+        const second = valueFor(b);
+        if (first === null || second === null) return first === second ? a.localeCompare(b) : first === null ? 1 : -1;
+        const difference = state.sort === "growth-desc" ? second - first : first - second;
+        return difference || a.localeCompare(b);
       });
     }
 
@@ -659,13 +982,13 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
       const height = top + agencies.length * rowHeight + axisHeight + 8;
       const plotWidth = width - left - right;
       const scaleMin = 6.0;
-      const scaleMax = 7.4;
+      const scaleMax = 7.5;
       const ticks = [6.0, 6.5, 7.0, 7.5].filter((tick) => tick <= scaleMax);
       const x = (value) => left + ((value - scaleMin) / (scaleMax - scaleMin)) * plotWidth;
       svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
       svg.setAttribute("height", String(height));
       svg.innerHTML = "";
-      document.getElementById("chartDescription").textContent = `${agencies.length} agencies shown. ${series.map(formatYear).join(" and ")} GDP growth forecasts are plotted from 6.0 to 7.4 percent.`;
+      document.getElementById("chartDescription").textContent = `${agencies.length} agencies shown. ${series.map(formatYear).join(" and ")} GDP growth forecasts are plotted from 6.0 to 7.5 percent.`;
       if (!agencies.length) {
         svg.setAttribute("height", "76");
         svg.innerHTML = `<text x="10" y="38" fill="#465052" font-size="13">No matching agencies. Clear the search to restore the forecast board.</text>`;
@@ -783,6 +1106,7 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
       const visibleNames = getVisibleAgencies();
       renderSignals(visibleNames);
       renderChart(visibleNames);
+      renderAnalysis();
       renderList(visibleNames);
       document.querySelectorAll(".year-button").forEach((button) => {
         button.setAttribute("aria-pressed", String(button.dataset.year === state.year));
@@ -831,7 +1155,10 @@ FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, a
     document.getElementById("printButton").addEventListener("click", () => window.print());
     renderSources();
     render();
-    window.addEventListener("resize", () => renderChart(getVisibleAgencies()));
+    window.addEventListener("resize", () => {
+      renderChart(getVisibleAgencies());
+      renderRevisionChart(matchedPointForecasts());
+    });
   </script>
 </body>
 </html>
