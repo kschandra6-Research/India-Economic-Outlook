@@ -1,0 +1,836 @@
+<!--
+THESIS: An airport wayfinding board makes agency outlooks comparable at a glance, not a stack of generic KPI cards.
+OWN-WORLD: Saturated route-yellow signs, black ink, white pictograms, and cobalt prior-year markers; crisp humanist sans plus tabular figures.
+STORY: Readers scan the FY28 growth corridor, compare FY27 estimates, then open an agency to inspect its drivers, policy, and cited workbook references.
+FIRST VIEWPORT: Yellow title band above live filters and a four-signal strip; the paired-year forecast board begins immediately below, with agency rows next.
+FORM: Grounded direction 4, airport-terminal wayfinding; grounded structure 7, an agency-led departure board. Seed keys: direction 18627a80, surface ac5dda1b.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive comparison of agency projections for India's FY2027–28 economic outlook.">
+  <title>India Economic Outlook · FY2027–28</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #15191a;
+      --ink-soft: #465052;
+      --muted: #667174;
+      --paper: #f4f6f5;
+      --white: #fff;
+      --line: #d8dddc;
+      --line-dark: #aeb7b6;
+      --yellow: #ffd928;
+      --yellow-deep: #e9bd00;
+      --blue: #385ce8;
+      --blue-pale: #e7ecff;
+      --teal: #167b71;
+      --teal-pale: #dff1ec;
+      --orange: #b9441c;
+      --orange-pale: #fbe9dc;
+      --shadow: 0 18px 45px rgb(21 25 26 / 8%);
+      --sans: "Arial", "Helvetica Neue", sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      font-family: var(--sans);
+      background: var(--paper);
+      color: var(--ink);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; }
+    button, input, select { font: inherit; }
+    button, select { color: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px;
+    }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    .skip-link {
+      position: absolute; left: 1rem; top: -4rem; z-index: 20;
+      padding: .75rem 1rem; background: var(--ink); color: white;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    .masthead {
+      position: relative;
+      overflow: hidden;
+      padding: 0 clamp(1.2rem, 5vw, 5.5rem);
+      background: var(--yellow);
+      border-bottom: 1px solid var(--ink);
+    }
+    .masthead::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      width: 24rem;
+      height: 24rem;
+      right: 8%;
+      top: -15rem;
+      border: 1px solid rgb(21 25 26 / 24%);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2rem rgb(21 25 26 / 5%), 0 0 0 4rem rgb(21 25 26 / 4%);
+      pointer-events: none;
+    }
+    .topline {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 3.8rem;
+      border-bottom: 1px solid rgb(21 25 26 / 25%);
+      gap: 1rem;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: .65rem;
+      font-size: .72rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase;
+    }
+    .brand-mark {
+      display: grid; width: 1.7rem; height: 1.7rem; place-items: center;
+      background: var(--ink); color: var(--yellow); font-size: .8rem; font-weight: 900;
+    }
+    .top-meta {
+      display: flex; align-items: center; gap: .55rem;
+      font: 700 .68rem var(--mono); letter-spacing: .05em; text-transform: uppercase;
+    }
+    .live-dot {
+      width: .5rem; height: .5rem; border-radius: 50%; background: var(--teal);
+      box-shadow: 0 0 0 3px rgb(22 123 113 / 15%);
+    }
+    .intro {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end; gap: 2rem;
+      padding: clamp(2.5rem, 6vw, 5.5rem) 0 clamp(2rem, 4vw, 3.5rem);
+    }
+    h1 {
+      max-width: 12ch; margin: 0;
+      font-size: clamp(2.8rem, 7.5vw, 6.6rem);
+      line-height: .91; letter-spacing: -.065em; font-weight: 900;
+    }
+    h1 span { display: block; }
+    .intro-note {
+      width: min(25rem, 30vw);
+      margin: 0 0 .35rem;
+      font-size: clamp(.95rem, 1.2vw, 1.08rem);
+      line-height: 1.5; font-weight: 600;
+    }
+    .route-tag {
+      display: inline-flex; align-items: center; gap: .55rem;
+      margin-top: 1.35rem; padding: .52rem .7rem;
+      border: 1px solid var(--ink); font: 700 .67rem var(--mono);
+      letter-spacing: .03em; text-transform: uppercase;
+    }
+    .route-tag b { font-size: 1rem; }
+
+    main { max-width: 1540px; margin: 0 auto; padding: 0 clamp(1rem, 4.5vw, 4rem) 4rem; }
+    .control-deck {
+      display: grid; grid-template-columns: auto minmax(14rem, 1fr) auto;
+      align-items: center; gap: 1rem;
+      padding: 1rem 0 1.35rem; border-bottom: 1px solid var(--line-dark);
+    }
+    .year-switch { display: flex; gap: .35rem; }
+    .year-button {
+      min-height: 2.55rem; padding: .55rem .8rem;
+      border: 1px solid var(--line-dark); background: transparent;
+      font: 700 .69rem var(--mono); letter-spacing: -.01em;
+      transition: background .18s ease, color .18s ease, border-color .18s ease;
+    }
+    .year-button:hover { border-color: var(--ink); }
+    .year-button[aria-pressed="true"] { background: var(--ink); color: white; border-color: var(--ink); }
+    .search-wrap { position: relative; max-width: 30rem; justify-self: center; width: 100%; }
+    .search-wrap::before {
+      content: "⌕"; position: absolute; left: .85rem; top: 50%; transform: translateY(-55%);
+      font-size: 1.35rem; color: var(--ink-soft); pointer-events: none;
+    }
+    .search-wrap input {
+      width: 100%; height: 2.7rem; padding: 0 2.5rem;
+      border: 1px solid var(--line-dark); border-radius: 0; background: var(--white);
+      color: var(--ink); font-size: .88rem;
+    }
+    .search-wrap input::placeholder { color: #586365; opacity: 1; }
+    .search-clear {
+      position: absolute; right: .4rem; top: 50%; transform: translateY(-50%);
+      width: 1.8rem; height: 1.8rem; border: 0; background: transparent; color: var(--ink-soft);
+      font-size: 1.1rem;
+    }
+    .deck-actions { display: flex; justify-content: flex-end; gap: .45rem; }
+    .action-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+      min-height: 2.55rem; padding: .55rem .75rem;
+      border: 1px solid var(--ink); background: transparent;
+      font-size: .72rem; font-weight: 750;
+    }
+    .action-button:hover { background: var(--ink); color: white; }
+    .action-button .glyph { font-size: .95rem; line-height: 1; }
+
+    .signal-strip {
+      display: grid; grid-template-columns: 1.1fr 1fr 1fr 1.3fr;
+      margin: 1.5rem 0 1.7rem; background: var(--white); border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .signal {
+      min-height: 8.2rem; padding: 1.05rem 1.25rem 1.1rem;
+      border-right: 1px solid var(--line);
+    }
+    .signal:last-child { border-right: 0; }
+    .signal-label {
+      display: flex; align-items: center; gap: .5rem; margin: 0 0 .7rem;
+      color: var(--ink-soft); font: 700 .66rem var(--mono);
+      letter-spacing: .045em; text-transform: uppercase;
+    }
+    .signal-number { margin: 0; font-size: clamp(1.7rem, 3vw, 2.45rem); font-weight: 850; letter-spacing: -.06em; line-height: 1; }
+    .signal-note { margin: .45rem 0 0; color: var(--muted); font-size: .74rem; line-height: 1.4; }
+    .signal:nth-child(1) { background: var(--yellow); }
+    .signal:nth-child(2) .signal-number { color: var(--blue); }
+    .signal:nth-child(3) .signal-number { color: var(--teal); }
+    .signal:nth-child(4) { background: var(--ink); color: white; }
+    .signal:nth-child(4) .signal-label, .signal:nth-child(4) .signal-note { color: #d7dfde; }
+    .signal:nth-child(4) .signal-number { color: var(--yellow); }
+
+    .section-heading {
+      display: flex; justify-content: space-between; align-items: end; gap: 1rem;
+      margin: 2.8rem 0 1rem;
+    }
+    .section-heading h2 { margin: 0; font-size: clamp(1.4rem, 2.4vw, 2rem); letter-spacing: -.045em; }
+    .section-heading p { margin: .42rem 0 0; color: var(--ink-soft); font-size: .83rem; line-height: 1.4; }
+    .section-code { font: 700 .66rem var(--mono); text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .board {
+      background: var(--white); border: 1px solid var(--line); box-shadow: var(--shadow);
+    }
+    .board-top {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: .9rem 1.15rem; background: var(--ink); color: white;
+    }
+    .board-title {
+      display: flex; align-items: center; gap: .7rem;
+      font-size: .78rem; font-weight: 750; letter-spacing: .015em;
+    }
+    .board-title-mark {
+      display: grid; place-items: center; width: 1.55rem; height: 1.55rem;
+      background: var(--yellow); color: var(--ink); font-weight: 900;
+    }
+    .legend { display: flex; align-items: center; gap: 1rem; font-size: .7rem; color: #f0f2f2; }
+    .legend span { display: inline-flex; align-items: center; gap: .42rem; }
+    .legend i { width: .68rem; height: .68rem; display: inline-block; background: var(--yellow); }
+    .legend .prior { background: #91a7ff; }
+    .chart-area { padding: .85rem 1.2rem .35rem; }
+    #forecastChart { display: block; width: 100%; overflow: visible; }
+    .chart-caption {
+      display: flex; justify-content: space-between; gap: 1rem;
+      padding: .8rem 1.2rem 1rem; border-top: 1px solid var(--line);
+      color: var(--ink-soft); font-size: .73rem; line-height: 1.45;
+    }
+    .chart-caption strong { color: var(--ink); }
+    .axis-label { fill: #667174; font: 11px var(--mono); }
+    .agency-label { fill: #15191a; font: 700 12px var(--sans); }
+    .bar-value { fill: #15191a; font: 700 11px var(--mono); }
+    .bar-track { stroke: #e9edeb; stroke-width: 7; }
+    .gridline { stroke: #e1e6e4; stroke-width: 1; }
+    .chart-hit { cursor: pointer; }
+    .chart-hit:focus .bar-track, .chart-hit:hover .bar-track { stroke: #d9dfdd; }
+
+    .table-toolbar {
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+      padding: .75rem 0; border-bottom: 1px solid var(--line-dark);
+      font-size: .75rem; color: var(--ink-soft);
+    }
+    .table-toolbar strong { color: var(--ink); }
+    .sort-wrap { display: flex; align-items: center; gap: .5rem; }
+    .sort-wrap label { font-size: .72rem; }
+    .sort-wrap select {
+      height: 2rem; padding: 0 2rem 0 .55rem; border: 1px solid var(--line-dark);
+      border-radius: 0; background: white; font-size: .72rem;
+    }
+    .agency-list { border-top: 0; }
+    .agency-row {
+      display: grid; grid-template-columns: minmax(12rem, 1.25fr) minmax(14rem, 1.25fr) minmax(6rem, .55fr) minmax(6.5rem, .6fr) auto;
+      align-items: center; gap: 1rem; width: 100%; min-height: 4.2rem;
+      padding: .8rem 1rem; border: 0; border-bottom: 1px solid var(--line); background: var(--white);
+      text-align: left; transition: background .16s ease;
+    }
+    .agency-row:hover { background: #f7f8f8; }
+    .agency-row[aria-expanded="true"] { background: #f1f3f2; }
+    .agency-cell { min-width: 0; }
+    .agency-name { display: flex; align-items: center; gap: .72rem; font-size: .84rem; font-weight: 750; }
+    .agency-emblem {
+      display: grid; flex: 0 0 2rem; height: 2rem; place-items: center;
+      background: var(--ink); color: white; font: 700 .61rem var(--mono);
+    }
+    .growth-value { font: 750 .82rem var(--mono); white-space: nowrap; }
+    .growth-value .range-low { color: var(--ink); }
+    .growth-value .range-high { color: var(--blue); }
+    .year-pair { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+    .year-pill {
+      display: inline-flex; align-items: center; gap: .38rem; padding: .3rem .45rem;
+      font: 700 .68rem var(--mono); white-space: nowrap; background: #f0f2f1;
+    }
+    .year-pill.current { background: #fff2ad; }
+    .year-pill.previous { background: var(--blue-pale); color: #203da7; }
+    .pill-dot { width: .48rem; height: .48rem; border-radius: 50%; background: var(--yellow-deep); }
+    .previous .pill-dot { background: var(--blue); }
+    .inflation-value { font: 700 .75rem var(--mono); }
+    .inflation-value.missing { color: var(--muted); font-family: var(--sans); font-weight: 500; }
+    .source-codes { display: flex; gap: .25rem; flex-wrap: wrap; }
+    .source-code {
+      min-width: 1.5rem; padding: .2rem .28rem; background: #edf0ef;
+      color: #364142; text-align: center; font: 700 .61rem var(--mono);
+    }
+    .row-chevron { color: var(--ink-soft); font-size: 1.1rem; transition: transform .18s ease; }
+    .agency-row[aria-expanded="true"] .row-chevron { transform: rotate(90deg); }
+    .detail-panel {
+      display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem 2rem;
+      padding: 1.2rem 1.4rem 1.35rem 3.75rem; border-bottom: 1px solid var(--line-dark);
+      background: #eef1ef;
+    }
+    .detail-panel[hidden] { display: none; }
+    .detail-block h3 {
+      margin: 0 0 .55rem; color: var(--ink-soft);
+      font: 700 .64rem var(--mono); letter-spacing: .045em; text-transform: uppercase;
+    }
+    .detail-block p { max-width: 72ch; margin: 0; color: #2d3738; font-size: .82rem; line-height: 1.58; }
+    .detail-sources { display: flex; align-items: flex-start; gap: .45rem; flex-wrap: wrap; }
+    .detail-sources span { padding: .3rem .42rem; background: white; font: 700 .65rem var(--mono); }
+    .empty-state { padding: 2rem 1rem; color: var(--ink-soft); text-align: center; font-size: .88rem; }
+    .empty-state strong { display: block; margin-bottom: .3rem; color: var(--ink); }
+
+    .sources-panel {
+      margin-top: 2.5rem; border-top: 3px solid var(--yellow-deep); background: var(--white);
+    }
+    .sources-panel summary {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 1rem 1.15rem; cursor: pointer; list-style: none; font-size: .9rem; font-weight: 750;
+    }
+    .sources-panel summary::-webkit-details-marker { display: none; }
+    .sources-panel summary::after { content: "+"; font: 1.2rem var(--mono); }
+    .sources-panel[open] summary::after { content: "−"; }
+    .source-count { margin-left: auto; margin-right: .4rem; color: var(--muted); font: 700 .67rem var(--mono); }
+    .source-list {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 2rem;
+      margin: 0; padding: 0 1.15rem 1.2rem; list-style: none; counter-reset: sources;
+    }
+    .source-list li {
+      display: grid; grid-template-columns: 2.25rem 1fr; gap: .7rem;
+      padding: .7rem 0; border-top: 1px solid var(--line); color: #374243;
+      font-size: .75rem; line-height: 1.5;
+    }
+    .source-list li span:first-child { color: var(--blue); font: 700 .7rem var(--mono); }
+    .method-note {
+      display: flex; justify-content: space-between; gap: 1.2rem; align-items: start;
+      padding: 1rem 0; color: var(--muted); font-size: .7rem; line-height: 1.5;
+    }
+    .method-note p { max-width: 80ch; margin: 0; }
+    .method-note a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    footer {
+      display: flex; justify-content: space-between; gap: 1rem;
+      padding: 1rem clamp(1rem, 4.5vw, 4rem);
+      background: var(--ink); color: #edf1f0; font-size: .68rem;
+    }
+    footer span:last-child { color: #c4cecc; font-family: var(--mono); }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+
+    @media (max-width: 900px) {
+      .intro { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
+      .intro > * { min-width: 0; }
+      .intro-note { width: min(42rem, 100%); }
+      .control-deck { grid-template-columns: 1fr auto; }
+      .search-wrap { grid-column: 1 / -1; grid-row: 2; max-width: none; }
+      .deck-actions { grid-column: 2; grid-row: 1; }
+      .signal-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .signal:nth-child(2) { border-right: 0; }
+      .signal:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .agency-row { grid-template-columns: minmax(10rem, 1fr) minmax(13rem, 1.1fr) minmax(5.7rem, .5fr) auto; }
+      .agency-row .sources-cell { display: none; }
+    }
+    @media (max-width: 620px) {
+      .topline { min-height: 3.35rem; }
+      .masthead::after { display: none; }
+      .brand { font-size: .62rem; }
+      .top-meta { gap: .38rem; font-size: .56rem; }
+      .top-board { display: none; }
+      .intro { padding: 2.7rem 0 2.2rem; }
+      h1 { max-width: none; font-size: clamp(2.3rem, 11.4vw, 3.6rem); }
+      .intro-note { font-size: .9rem; }
+      main { padding-inline: 1rem; }
+      .control-deck { grid-template-columns: 1fr; gap: .7rem; padding-top: .85rem; }
+      .year-switch { display: grid; grid-template-columns: repeat(3, 1fr); }
+      .year-button { min-width: 0; padding-inline: .2rem; font-size: .58rem; }
+      .search-wrap { grid-column: 1; grid-row: 2; }
+      .deck-actions { grid-column: 1; grid-row: 3; justify-content: stretch; }
+      .deck-actions .action-button { flex: 1; }
+      .signal-strip { margin-top: 1rem; }
+      .signal { min-height: 7.1rem; padding: .85rem .8rem; }
+      .signal-label { font-size: .57rem; }
+      .signal-note { font-size: .67rem; }
+      .section-heading { align-items: start; flex-direction: column; }
+      .board-top { align-items: flex-start; flex-direction: column; }
+      .chart-area { padding: .7rem .65rem .2rem; }
+      .chart-caption { flex-direction: column; gap: .35rem; padding: .7rem .8rem; }
+      .table-toolbar { align-items: flex-start; flex-direction: column; }
+      .agency-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: .55rem .5rem; padding: .85rem .7rem;
+      }
+      .agency-row .agency-cell:first-child { grid-column: 1; }
+      .agency-row .growth-cell { grid-column: 1; grid-row: 2; }
+      .agency-row .inflation-cell { grid-column: 1; grid-row: 3; }
+      .agency-row .sources-cell { display: block; grid-column: 1 / -1; grid-row: 4; }
+      .agency-row .chevron-cell { grid-column: 2; grid-row: 1; }
+      .agency-name { font-size: .8rem; }
+      .agency-emblem { flex-basis: 1.8rem; height: 1.8rem; }
+      .year-pair { gap: .38rem; }
+      .year-pill { padding: .25rem .35rem; font-size: .62rem; }
+      .inflation-value { font-size: .69rem; }
+      .detail-panel { grid-template-columns: 1fr; gap: 1rem; padding: 1rem .8rem 1.1rem; }
+      .source-list { grid-template-columns: 1fr; }
+      .method-note { flex-direction: column; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      body { background: white; }
+      .control-deck, footer, .skip-link { display: none !important; }
+      main { max-width: none; padding: 0; }
+      .masthead { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .signal-strip, .board { box-shadow: none; }
+      .detail-panel[hidden] { display: none !important; }
+      .sources-panel:not([open]) > :not(summary) { display: block; }
+      .agency-row { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to outlook data</a>
+  <header class="masthead">
+    <div class="topline">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">IN</span> India · Economic Outlook</div>
+      <div class="top-meta"><span class="live-dot" aria-hidden="true"></span><span class="top-board">Forecast board</span><span aria-hidden="true">/</span><span>FY 2027–28</span></div>
+    </div>
+    <div class="intro">
+      <div>
+        <h1><span>India's next</span><span>growth route.</span></h1>
+        <div class="route-tag"><b aria-hidden="true">→</b> Outlook comparison <span aria-hidden="true">·</span> FY2027–28</div>
+      </div>
+      <p class="intro-note">A clear route through the latest agency forecasts: growth, inflation, the forces behind the numbers, and where policy may head next.</p>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="control-deck" aria-label="Dashboard controls">
+      <div class="year-switch" role="group" aria-label="Choose fiscal year">
+        <button class="year-button" type="button" data-year="both" aria-pressed="true">Compare years</button>
+        <button class="year-button" type="button" data-year="FY2027–28" aria-pressed="false">FY27–28</button>
+        <button class="year-button" type="button" data-year="FY2026–27" aria-pressed="false">FY26–27</button>
+      </div>
+      <label class="search-wrap">
+        <span class="sr-only">Search agencies, drivers, or policy outlook</span>
+        <input id="searchInput" type="search" placeholder="Search agency, driver, or policy…" autocomplete="off">
+        <button class="search-clear" id="clearSearch" type="button" aria-label="Clear search" hidden>×</button>
+      </label>
+      <div class="deck-actions">
+        <button class="action-button" id="exportButton" type="button"><span class="glyph" aria-hidden="true">↓</span> Export CSV</button>
+        <button class="action-button" id="printButton" type="button"><span class="glyph" aria-hidden="true">▣</span> Print</button>
+      </div>
+    </section>
+
+    <section class="signal-strip" aria-label="Outlook at a glance">
+      <div class="signal">
+        <p class="signal-label"><span aria-hidden="true">◉</span> Agencies in view</p>
+        <p class="signal-number" id="agencyCount">9</p>
+        <p class="signal-note" id="agencyCountNote">FY2027–28 forecasts represented</p>
+      </div>
+      <div class="signal">
+        <p class="signal-label"><span aria-hidden="true">↗</span> Median growth forecast</p>
+        <p class="signal-number" id="growthMidpoint">6.6%</p>
+        <p class="signal-note" id="growthRange">Forecasts span 6.5%–7.1%</p>
+      </div>
+      <div class="signal">
+        <p class="signal-label"><span aria-hidden="true">◎</span> Inflation outlook</p>
+        <p class="signal-number" id="inflationRange">4.0–4.2%</p>
+        <p class="signal-note" id="inflationNote">Across all FY2027–28 entries</p>
+      </div>
+      <div class="signal">
+        <p class="signal-label"><span aria-hidden="true">↔</span> Watch the difference</p>
+        <p class="signal-number" id="spreadValue">0.6 pp</p>
+        <p class="signal-note" id="spreadNote">Width of the FY2027–28 GDP forecast range</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="chartHeading">
+      <div class="section-heading">
+        <div>
+          <h2 id="chartHeading">Forecasts, side by side</h2>
+          <p>Each marker follows an agency's GDP growth projection. Select a row for its drivers and policy outlook.</p>
+        </div>
+        <span class="section-code">GDP growth · %</span>
+      </div>
+      <div class="board">
+        <div class="board-top">
+          <div class="board-title"><span class="board-title-mark" aria-hidden="true">→</span> Agency forecast board</div>
+          <div class="legend" id="chartLegend" aria-label="Chart legend">
+            <span class="current-key"><i aria-hidden="true"></i> FY2027–28</span>
+            <span class="previous-key"><i class="prior" aria-hidden="true"></i> FY2026–27</span>
+          </div>
+        </div>
+        <div class="chart-area">
+          <svg id="forecastChart" role="img" aria-label="GDP growth forecast chart"></svg>
+          <p class="sr-only" id="chartDescription"></p>
+        </div>
+        <div class="chart-caption">
+          <span><strong>How to read:</strong> bars begin at 6.0%; a line shows the forecast range where an agency reports one.</span>
+          <span>Not in source is shown as —</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="agencyHeading">
+      <div class="section-heading">
+        <div>
+          <h2 id="agencyHeading">Agency outlooks</h2>
+          <p>Open any agency to see the economic drivers, policy outlook, and workbook reference numbers.</p>
+        </div>
+        <span class="section-code" id="resultCode">9 agencies · 17 entries</span>
+      </div>
+      <div class="table-toolbar">
+        <span id="tableSummary"><strong>9 agencies</strong> represented · figures shown as reported</span>
+        <div class="sort-wrap">
+          <label for="sortSelect">Sort by</label>
+          <select id="sortSelect">
+            <option value="agency">Agency name</option>
+            <option value="growth-desc">Growth · high to low</option>
+            <option value="growth-asc">Growth · low to high</option>
+          </select>
+        </div>
+      </div>
+      <div class="agency-list" id="agencyList" aria-live="polite"></div>
+    </section>
+
+    <details class="sources-panel" id="sourcesPanel">
+      <summary><span>Workbook source references</span><span class="source-count">12 references</span></summary>
+      <ol class="source-list" id="sourceList"></ol>
+    </details>
+    <div class="method-note">
+      <p>Source: supplied workbook, “India Economic Outlook Projections for FY 2027-2028” · Table 1 and Source References. Forecast ranges and unavailable figures are retained as reported. Summary figures use the selected fiscal year; when comparing both years, the growth median, range, and inflation range refer to FY2027–28. ADB's range midpoint is used only for the median summary.</p>
+      <a href="#main-content">Back to top ↑</a>
+    </div>
+  </main>
+  <footer>
+    <span>India Economic Outlook · Forecasts are agency projections, not realized results.</span>
+    <span>FY27–28 / FY26–27</span>
+  </footer>
+
+  <script>
+    const sourceReferences = [
+      "India Economic Outlook FY2027–2028: Macroeconomic Resilience, Structural Transformations, and Strategic Growth Trajectories",
+      "IMF Revises India's FY27 GDP Growth Forecast to 6.4%; Sees Recovery to 6.7% in FY28",
+      "IMF Projects India's GDP Growth at 6.4% in FY2027, 6.7% in FY2028 | Daily Pioneer",
+      "IMF Lowers India's 2027 Economic Growth Forecast to 6.4%, ETBFSI - BFSI News",
+      "Fitch raises India FY27 GDP growth forecast to 6.9%, FY28 growth seen 6.5% - Informist",
+      "Four global agencies raise India's FY27 growth forecasts on resilient economic activity",
+      "India to grow at 7% in FY27 as next phase of growth hinges on infra and deeper capital markets: S&P Global",
+      "India's GDP growth forecast: After Moody's, S&P, Fitch and OECD raise FY27 projections",
+      "India's GDP growth seen at 7.5% in 2026, to moderate to 7.1% in 2027 and 6.8% in 2028: Allianz Research - ANI News",
+      "India to remain fastest-growing major economy in FY27 despite global slowdown: IMF",
+      "Global Agencies Hike India's FY27 Growth Projections To Around 7% - Deccan Chronicle",
+      "World Bank Projects India's Current Account Deficit to Rise by 2027 - Binance"
+    ];
+
+    const forecasts = [
+      { agency: "International Monetary Fund (IMF)", year: "FY2027–28", growth: "6.7%", inflation: "4.0%–4.2%", low: 6.7, high: 6.7, drivers: "Lagged positive effects of private corporate capital investments, supply-chain realignments, easing energy import costs, resilient private final consumption expenditure, robust services activity, return to medium-term trend, and high rates of gross fixed capital formation.", policy: "Disinflation allows monetary policy easing back toward 5.00%–5.25%; central government targets fiscal deficit below 4.0% of GDP.", sources: [1, 2, 3, 4] },
+      { agency: "Reserve Bank of India (RBI)", year: "FY2027–28", growth: "6.5%", inflation: "4.0%–4.2%", low: 6.5, high: 6.5, drivers: "Private consumption, services activity, normalization of monsoon cycles, improved agricultural technology, and cold-chain logistics.", policy: "Policy rates projected to ease toward 5.00%–5.25% as inflation cools toward target midpoint of 4.0%.", sources: [1] },
+      { agency: "S&P Global Ratings", year: "FY2027–28", growth: "6.5%", inflation: "4.0%–4.2%", low: 6.5, high: 6.5, drivers: "Easing energy price shocks, private sector investment, and PLI scheme execution.", policy: "Disinflation provides scope for monetary easing.", sources: [1] },
+      { agency: "Fitch Ratings", year: "FY2027–28", growth: "6.5%", inflation: "4.0%–4.2%", low: 6.5, high: 6.5, drivers: "Growth supported by consumer spending and investment; convergence toward long-term trend, easing energy shocks, resilient services sector, and positive net export contributions.", policy: "Disinflationary environment supports policy rate cuts toward 5.00%–5.25%, with repo rates expected to ease back to 5.5% in 2028.", sources: [1, 5, 6] },
+      { agency: "Moody's Ratings", year: "FY2027–28", growth: "6.5%", inflation: "4.0%–4.2%", low: 6.5, high: 6.5, drivers: "Resilient domestic demand, manufacturing push, and stable capital formation.", policy: "Monetary policy stance transitions to neutral/easing.", sources: [1] },
+      { agency: "OECD", year: "FY2027–28", growth: "6.5%", inflation: "4.0%–4.2%", low: 6.5, high: 6.5, drivers: "Moderation from FY27 high followed by gradual recovery after weakening growth in second half of 2026; supported by infrastructure buildout, domestic market growth, and reduced purchasing power, with Middle East conflict as a key risk factor.", policy: "Lowering capital costs through monetary easing as inflation stabilizes; temporarily raise policy rates to offset inflationary pressures with government price support measures continuing to mitigate energy price pressures.", sources: [1, 6, 7, 8] },
+      { agency: "Asian Development Bank (ADB)", year: "FY2027–28", growth: "6.6%–7.1%", inflation: "4.0%–4.2%", low: 6.6, high: 7.1, drivers: "Stronger base created by higher FY27 growth, private consumption expenditure, high rates of gross fixed capital formation, rising household incomes, revision of government salaries, tax collections, and services export expansion.", policy: "Monetary policy easing expected in FY28; low interest rates.", sources: [1, 6, 7, 8] },
+      { agency: "Allianz Research", year: "FY2027–28", growth: "6.8%", inflation: "4.0%–4.2%", low: 6.8, high: 6.8, drivers: "Energy markets, bond markets, artificial intelligence-related investment, energy and food inflation, currency pressures, strong domestic consumption, high-value manufacturing, and services sector strength.", policy: "Policy rates easing toward 5.00%–5.25%; tighter monetary conditions with central bank joining a tightening cycle in Q4 sensitive to energy/food inflation and currency pressures.", sources: [1, 9] },
+      { agency: "World Bank", year: "FY2027–28", growth: "6.6%", inflation: "4.0%–4.2%", low: 6.6, high: 6.6, drivers: "Trade gap narrowing, current account deficit stabilizing to 1.2%–1.5% of GDP, and services exports.", policy: "Disinflationary trends support monetary easing.", sources: [1] },
+      { agency: "International Monetary Fund (IMF)", year: "FY2026–27", growth: "6.4%", inflation: "Not in source", low: 6.4, high: 6.4, drivers: "Supported by resilient private consumption and sustained momentum in the services sector, which offset a slowing global economy.", policy: "Not in source", sources: [10] },
+      { agency: "S&P Global Ratings", year: "FY2026–27", growth: "7.0%", inflation: "5.1%", low: 7.0, high: 7.0, drivers: "Robust economic activity across sectors, persistent inflationary pressures, unresolved conflict in West Asia, and weather-related risks.", policy: "Expects RBI to raise its policy interest rate by 25 bps in the current fiscal year.", sources: [11] },
+      { agency: "Fitch Ratings", year: "FY2026–27", growth: "6.9%", inflation: "5.5%", low: 6.9, high: 6.9, drivers: "Very robust dynamism, stronger-than-expected economic activity and resilience despite oil price/energy price shock and US-Iran war; momentum likely to moderate over remaining fiscal year.", policy: "Prompting RBI to increase interest rates by 0.25% (25 bps) in its October monetary policy meeting.", sources: [11] },
+      { agency: "Allianz Research", year: "FY2026–27", growth: "7.1%", inflation: "5.2%", low: 7.1, high: 7.1, drivers: "Energy markets, bond markets, artificial intelligence-related investment, energy and food inflation, currency pressures.", policy: "Tighter monetary conditions; central bank joining a tightening cycle in Q4; monetary policy sensitive to energy/food inflation and currency pressures.", sources: [9] },
+      { agency: "Asian Development Bank (ADB)", year: "FY2026–27", growth: "7.0%", inflation: "Not in source", low: 7.0, high: 7.0, drivers: "Benefited from lower-than-expected supply disruptions and sustained capital inflows, cushioning Middle East conflict impact.", policy: "Not in source", sources: [11] },
+      { agency: "Moody's Ratings", year: "FY2026–27", growth: "7.0%", inflation: "Not in source", low: 7.0, high: 7.0, drivers: "Fastest growth among all G20 economies; robust industrial activity, healthy consumption, strong goods exports, accelerating government investment.", policy: "Not in source", sources: [11] },
+      { agency: "OECD", year: "FY2026–27", growth: "7.1%", inflation: "Not in source", low: 7.1, high: 7.1, drivers: "Robust economic activity across sectors.", policy: "Not in source", sources: [11] },
+      { agency: "World Bank", year: "FY2026–27", growth: "Not in source", inflation: "Not in source", low: null, high: null, drivers: "Current account deficit projected to rise to 1.8% of GDP due to growing energy import bills and reliance on energy imports.", policy: "Not in source", sources: [12] }
+    ];
+
+    const agencyAbbreviations = {
+      "International Monetary Fund (IMF)": "IMF",
+      "Reserve Bank of India (RBI)": "RBI",
+      "S&P Global Ratings": "S&P",
+      "Fitch Ratings": "FIT",
+      "Moody's Ratings": "MO",
+      "OECD": "OECD",
+      "Asian Development Bank (ADB)": "ADB",
+      "Allianz Research": "ALZ",
+      "World Bank": "WB"
+    };
+    const state = { year: "both", query: "", sort: "agency", openAgency: null };
+    const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+    const agencyNames = [...new Set(forecasts.map((item) => item.agency))];
+    const formatYear = (year) => year === "FY2027–28" ? "FY27–28" : "FY26–27";
+
+    function yearRows() {
+      if (state.year === "both") return forecasts;
+      return forecasts.filter((item) => item.year === state.year);
+    }
+
+    function getVisibleAgencies() {
+      const q = state.query.trim().toLocaleLowerCase();
+      let names = agencyNames.filter((agency) => {
+        if (!q) return true;
+        return forecasts.some((item) => item.agency === agency
+          && (state.year === "both" || item.year === state.year)
+          && [item.agency, item.drivers, item.policy, item.inflation, item.growth].join(" ").toLocaleLowerCase().includes(q));
+      });
+      if (state.sort === "agency") return names.sort((a, b) => a.localeCompare(b));
+      return names.sort((a, b) => {
+        const valueFor = (name) => {
+          const item = forecasts.find((entry) => entry.agency === name && entry.year === "FY2027–28")
+            || forecasts.find((entry) => entry.agency === name);
+          return item && item.low !== null ? (item.low + item.high) / 2 : -Infinity;
+        };
+        return (valueFor(b) - valueFor(a)) * (state.sort === "growth-asc" ? -1 : 1) || a.localeCompare(b);
+      });
+    }
+
+    function renderSignals(visibleNames) {
+      const metricYear = state.year === "both" ? "FY2027–28" : state.year;
+      const matching = forecasts.filter((item) => item.year === metricYear && visibleNames.includes(item.agency));
+      const withGrowth = matching.filter((item) => item.low !== null);
+      const low = withGrowth.length ? Math.min(...withGrowth.map((item) => item.low)) : null;
+      const high = withGrowth.length ? Math.max(...withGrowth.map((item) => item.high)) : null;
+      const midpointValues = withGrowth.map((item) => (item.low + item.high) / 2).sort((a, b) => a - b);
+      const median = midpointValues.length
+        ? (midpointValues.length % 2 ? midpointValues[(midpointValues.length - 1) / 2]
+          : (midpointValues[midpointValues.length / 2 - 1] + midpointValues[midpointValues.length / 2]) / 2)
+        : null;
+      const inflations = matching
+        .filter((item) => item.inflation !== "Not in source")
+        .map((item) => item.inflation.match(/\d+(?:\.\d+)?/g).map(Number))
+        .filter((values) => values.length > 0);
+      const inflationLow = inflations.length ? Math.min(...inflations.map((values) => values[0])) : null;
+      const inflationHigh = inflations.length ? Math.max(...inflations.map((values) => values[values.length - 1])) : null;
+      const inflationText = inflationLow === null ? "—" : inflationLow === inflationHigh
+        ? `${inflationLow.toFixed(1)}%`
+        : `${inflationLow.toFixed(1)}%–${inflationHigh.toFixed(1)}%`;
+      const yearLabel = metricYear;
+      document.getElementById("agencyCount").textContent = String(visibleNames.length);
+      document.getElementById("agencyCountNote").textContent = `${yearLabel} · ${matching.length} reported entries`;
+      document.getElementById("growthMidpoint").textContent = median === null ? "—" : `${median.toFixed(1)}%`;
+      document.getElementById("growthRange").textContent = low === null ? "No growth values in view" : `Median of agency midpoints · range ${low.toFixed(1)}%–${high.toFixed(1)}%`;
+      document.getElementById("inflationRange").textContent = inflationText;
+      document.getElementById("inflationNote").textContent = inflations.length
+        ? `${inflations.length} reported inflation forecast${inflations.length === 1 ? "" : "s"} · ${yearLabel}`
+        : "No inflation forecasts in this view";
+      document.getElementById("spreadValue").textContent = low === null ? "—" : `${(high - low).toFixed(1)} pp`;
+      document.getElementById("spreadNote").textContent = low === null ? "No GDP growth range in view" : `Width of the ${yearLabel} GDP forecast range`;
+      const entries = yearRows().filter((item) => visibleNames.includes(item.agency)).length;
+      document.getElementById("resultCode").textContent = `${visibleNames.length} agencies · ${entries} entr${entries === 1 ? "y" : "ies"}`;
+      document.getElementById("tableSummary").innerHTML = `<strong>${visibleNames.length} ${visibleNames.length === 1 ? "agency" : "agencies"}</strong> represented · figures shown as reported`;
+    }
+
+    function renderChart(visibleNames) {
+      const svg = document.getElementById("forecastChart");
+      const series = state.year === "both" ? ["FY2027–28", "FY2026–27"] : [state.year];
+      const agencies = visibleNames;
+      const width = Math.max(320, Math.round(svg.parentElement.clientWidth - 38));
+      const mobile = width < 560;
+      const left = mobile ? 70 : 160;
+      const right = mobile ? 55 : 82;
+      const top = 17;
+      const rowHeight = state.year === "both" ? (mobile ? 45 : 47) : (mobile ? 39 : 42);
+      const axisHeight = 29;
+      const height = top + agencies.length * rowHeight + axisHeight + 8;
+      const plotWidth = width - left - right;
+      const scaleMin = 6.0;
+      const scaleMax = 7.4;
+      const ticks = [6.0, 6.5, 7.0, 7.5].filter((tick) => tick <= scaleMax);
+      const x = (value) => left + ((value - scaleMin) / (scaleMax - scaleMin)) * plotWidth;
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.setAttribute("height", String(height));
+      svg.innerHTML = "";
+      document.getElementById("chartDescription").textContent = `${agencies.length} agencies shown. ${series.map(formatYear).join(" and ")} GDP growth forecasts are plotted from 6.0 to 7.4 percent.`;
+      if (!agencies.length) {
+        svg.setAttribute("height", "76");
+        svg.innerHTML = `<text x="10" y="38" fill="#465052" font-size="13">No matching agencies. Clear the search to restore the forecast board.</text>`;
+        return;
+      }
+      let markup = "";
+      ticks.forEach((tick) => {
+        const px = x(tick);
+        markup += `<line class="gridline" x1="${px}" y1="${top - 4}" x2="${px}" y2="${height - axisHeight + 1}"></line>`;
+        markup += `<text class="axis-label" x="${px}" y="${height - 7}" text-anchor="middle">${tick.toFixed(1)}%</text>`;
+      });
+      agencies.forEach((agency, index) => {
+        const y = top + index * rowHeight;
+        markup += `<text class="agency-label" x="${left - 11}" y="${y + rowHeight / 2 + 4}" text-anchor="end">${escapeHtml(mobile ? agencyAbbreviations[agency] : agency)}</text>`;
+        series.forEach((year, seriesIndex) => {
+          const item = forecasts.find((entry) => entry.agency === agency && entry.year === year);
+          if (!item) return;
+          const barY = y + (series.length === 2 ? (seriesIndex === 0 ? 14 : 32) : rowHeight / 2 + 1);
+          const color = year === "FY2027–28" ? "#e9bd00" : "#385ce8";
+          markup += `<g class="chart-hit" tabindex="0" role="button" aria-label="${escapeHtml(agency)} ${formatYear(year)}: ${escapeHtml(item.growth)}" data-agency="${escapeHtml(agency)}">`;
+          markup += `<line class="bar-track" x1="${left}" y1="${barY}" x2="${left + plotWidth}" y2="${barY}"></line>`;
+          if (item.low === null) {
+            markup += `<text class="axis-label" x="${left + plotWidth + 7}" y="${barY + 4}">—</text>`;
+          } else {
+            const x1 = x(item.low);
+            const x2 = x(item.high);
+            const barHeight = 7;
+            markup += `<line x1="${x1}" y1="${barY}" x2="${Math.max(x1 + 2, x2)}" y2="${barY}" stroke="${color}" stroke-width="${barHeight}" stroke-linecap="round"></line>`;
+            markup += `<circle cx="${x1}" cy="${barY}" r="4.5" fill="${color}" stroke="#fff" stroke-width="1.5"></circle>`;
+            if (item.high !== item.low) markup += `<circle cx="${x2}" cy="${barY}" r="4.5" fill="#fff" stroke="${color}" stroke-width="2"></circle>`;
+            const valueX = Math.min(width - 2, x2 + 9);
+            const anchor = valueX > width - right + 29 ? "end" : "start";
+            const labelX = anchor === "end" ? width - 4 : valueX;
+            markup += `<text class="bar-value" x="${labelX}" y="${barY + 4}" text-anchor="${anchor}">${escapeHtml(item.growth)}</text>`;
+          }
+          markup += `</g>`;
+        });
+      });
+      svg.innerHTML = markup;
+      svg.querySelectorAll(".chart-hit").forEach((mark) => {
+        mark.addEventListener("click", () => openAgency(mark.dataset.agency));
+        mark.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openAgency(mark.dataset.agency);
+          }
+        });
+      });
+    }
+
+    function entryFor(agency, year) {
+      return forecasts.find((item) => item.agency === agency && item.year === year);
+    }
+    function entriesToShow(agency) {
+      if (state.year === "both") return ["FY2027–28", "FY2026–27"].map((year) => entryFor(agency, year)).filter(Boolean);
+      const item = entryFor(agency, state.year);
+      return item ? [item] : [];
+    }
+    function rangeMarkup(value) {
+      if (!value || value === "Not in source") return `<span class="inflation-value missing">Not in source</span>`;
+      return `<span class="inflation-value">${escapeHtml(value)}</span>`;
+    }
+    function renderList(visibleNames) {
+      const list = document.getElementById("agencyList");
+      if (!visibleNames.length) {
+        list.innerHTML = `<div class="empty-state"><strong>No matching agencies</strong>Try another search term or clear the search to view all forecasts.</div>`;
+        return;
+      }
+      list.innerHTML = visibleNames.map((agency) => {
+        const items = entriesToShow(agency);
+        const active = items.find((item) => item.low !== null) || items[0];
+        const yearsMarkup = items.map((item) => `<span class="year-pill ${item.year === "FY2027–28" ? "current" : "previous"}"><i class="pill-dot" aria-hidden="true"></i>${formatYear(item.year)} <b>${escapeHtml(item.growth)}</b></span>`).join("");
+        const inflation = items.map((item) => `${formatYear(item.year)}: ${item.inflation}`).join(" · ");
+        const sourceChips = [...new Set(items.flatMap((item) => item.sources))].sort((a, b) => a - b).map((id) => `<span class="source-code">#${id}</span>`).join("");
+        const isOpen = state.openAgency === agency;
+        const detailText = active || items[0];
+        const yearDetail = state.year === "both"
+          ? items.map((item) => `<div class="detail-block"><h3>${formatYear(item.year)} · Economic drivers</h3><p>${escapeHtml(item.drivers)}</p></div><div class="detail-block"><h3>${formatYear(item.year)} · Policy outlook</h3><p>${escapeHtml(item.policy)}</p></div>`).join("")
+          : `<div class="detail-block"><h3>Economic drivers</h3><p>${escapeHtml(detailText.drivers)}</p></div><div class="detail-block"><h3>Monetary &amp; fiscal policy</h3><p>${escapeHtml(detailText.policy)}</p></div>`;
+        return `<article class="agency-entry">
+          <button class="agency-row" type="button" aria-expanded="${isOpen}" aria-controls="details-${agencyAbbreviations[agency]}" data-agency="${escapeHtml(agency)}">
+            <span class="agency-cell"><span class="agency-name"><span class="agency-emblem" aria-hidden="true">${agencyAbbreviations[agency]}</span>${escapeHtml(agency)}</span></span>
+            <span class="agency-cell growth-cell"><span class="year-pair">${yearsMarkup}</span></span>
+            <span class="agency-cell inflation-cell"><span class="sr-only">Inflation: </span>${rangeMarkup(inflation)}</span>
+            <span class="agency-cell sources-cell"><span class="source-codes" aria-label="Workbook references">${sourceChips}</span></span>
+            <span class="agency-cell chevron-cell"><span class="row-chevron" aria-hidden="true">›</span></span>
+          </button>
+          <div class="detail-panel" id="details-${agencyAbbreviations[agency]}" ${isOpen ? "" : "hidden"}>
+            ${yearDetail}
+            <div class="detail-block"><h3>Workbook references</h3><div class="detail-sources">${[...new Set(items.flatMap((item) => item.sources))].sort((a, b) => a - b).map((id) => `<span>#${id} · ${escapeHtml(sourceReferences[id - 1])}</span>`).join("")}</div></div>
+          </div>
+        </article>`;
+      }).join("");
+      list.querySelectorAll(".agency-row").forEach((button) => {
+        button.addEventListener("click", () => openAgency(button.dataset.agency));
+      });
+    }
+
+    function openAgency(agency) {
+      state.openAgency = state.openAgency === agency ? null : agency;
+      render();
+      const row = [...document.querySelectorAll(".agency-row")].find((button) => button.dataset.agency === agency);
+      if (row) {
+        row.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+        row.focus({ preventScroll: true });
+      }
+    }
+
+    function renderSources() {
+      document.getElementById("sourceList").innerHTML = sourceReferences
+        .map((reference, index) => `<li><span>#${index + 1}</span><span>${escapeHtml(reference)}</span></li>`).join("");
+    }
+
+    function render() {
+      const visibleNames = getVisibleAgencies();
+      renderSignals(visibleNames);
+      renderChart(visibleNames);
+      renderList(visibleNames);
+      document.querySelectorAll(".year-button").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.year === state.year));
+      });
+      document.getElementById("chartLegend").querySelector(".current-key").hidden = state.year === "FY2026–27";
+      document.getElementById("chartLegend").querySelector(".previous-key").hidden = state.year === "FY2027–28";
+    }
+
+    function downloadCsv() {
+      const visibleNames = getVisibleAgencies();
+      const rows = [["Agency", "Fiscal year", "GDP growth forecast", "Inflation forecast", "Key economic drivers and risk factors", "Monetary and fiscal policy outlook", "Source references"]];
+      forecasts.filter((item) => visibleNames.includes(item.agency) && (state.year === "both" || item.year === state.year))
+        .forEach((item) => rows.push([item.agency, item.year, item.growth, item.inflation, item.drivers, item.policy, item.sources.map((id) => `#${id}`).join(", ")]));
+      const csv = rows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\r\n");
+      const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "india-economic-outlook-fy2027-28.csv";
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    document.querySelectorAll(".year-button").forEach((button) => {
+      button.addEventListener("click", () => { state.year = button.dataset.year; state.openAgency = null; render(); });
+    });
+    document.getElementById("searchInput").addEventListener("input", (event) => {
+      state.query = event.target.value;
+      state.openAgency = null;
+      document.getElementById("clearSearch").hidden = !state.query;
+      render();
+    });
+    document.getElementById("clearSearch").addEventListener("click", () => {
+      const input = document.getElementById("searchInput");
+      input.value = "";
+      state.query = "";
+      state.openAgency = null;
+      document.getElementById("clearSearch").hidden = true;
+      render();
+      input.focus();
+    });
+    document.getElementById("sortSelect").addEventListener("change", (event) => { state.sort = event.target.value; render(); });
+    document.getElementById("exportButton").addEventListener("click", downloadCsv);
+    document.getElementById("printButton").addEventListener("click", () => window.print());
+    renderSources();
+    render();
+    window.addEventListener("resize", () => renderChart(getVisibleAgencies()));
+  </script>
+</body>
+</html>
